@@ -60,15 +60,27 @@
       justify-content: center;
     }
 
-    #controls button {
-      font-size: 1.3rem;
-      font-weight: 700;
-      border-radius: 14px;
-      border: none;
-      background: #FFD1B3; /* pastel peach */
-      color: #5a3d2b;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.25);
-    }
+ #controls button {
+  font-size: 1.3rem;
+  font-weight: 700;
+  border-radius: 14px;
+  border: none;
+  background: #FFD1B3; /* pastel peach */
+  color: #5a3d2b;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+}
+
+/* Prevent iPad text selection + popup menu */
+button {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Remove blue highlight ring */
+button:focus {
+  outline: none;
+}
 
     #controls button:active {
       background: #FFBC99;
@@ -106,7 +118,7 @@
   <h1>Blocks</h1>
 
   <div id="game-container">
-    <canvas id="board" width="300" height="600"></canvas>
+    <canvas id="board" width="260" height="520"></canvas>
 
     <div id="info">
       Score: <span id="score">0</span> &nbsp; | &nbsp;
