@@ -112,6 +112,29 @@ button:focus {
       transform: translateY(2px);
       background: #16a34a;
     }
+    /* Prevent iPad text selection + popup menu */
+button, html, body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation; /* stops double‑tap zoom */
+}
+
+/* Remove blue highlight ring */
+button:focus {
+  outline: none;
+}
+
+/* Auto-scale the game container */
+#game-container {
+  transform-origin: top center;
+}
+
+/* Prevent zooming when tapping rapidly */
+html, body {
+  touch-action: manipulation;
+}
+
   </style>
 </head>
 <body>
@@ -397,6 +420,56 @@ button:focus {
     document.getElementById("btn-hold").addEventListener("click", () => holdCurrentPiece());
 
     restartBtn.addEventListener("click", resetGame);
+    /* -----------------------------
+   AUTO‑SCALE CANVAS TO SCREEN
+------------------------------*/
+function autoScale() {
+  const container = document.getElementById("game-container");
+  const maxWidth = window.innerWidth * 0.95;
+  const scale = Math.min(maxWidth / container.offsetWidth, 1);
+  container.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener("resize", autoScale);
+window.addEventListener("orientationchange", autoScale);
+
+
+/* -----------------------------
+   TOUCH‑HOLD REPEAT MOVEMENT
+------------------------------*/
+let holdInterval = null;
+
+function startHold(action) {
+  action(); // immediate move
+  holdInterval = setInterval(action, 80); // repeat every 80ms
+}
+
+function stopHold() {
+  clearInterval(holdInterval);
+  holdInterval = null;
+}
+
+// LEFT HOLD
+document.getElementById("btn-left").addEventListener("touchstart", e => {
+  e.preventDefault();
+  startHold(() => move(-1));
+});
+document.getElementById("btn-left").addEventListener("touchend", stopHold);
+
+// RIGHT HOLD
+document.getElementById("btn-right").addEventListener("touchstart", e => {
+  e.preventDefault();
+  startHold(() => move(1));
+});
+document.getElementById("btn-right").addEventListener("touchend", stopHold);
+
+// DOWN HOLD (optional soft‑drop hold)
+document.getElementById("btn-down").addEventListener("touchstart", e => {
+  e.preventDefault();
+  startHold(() => softDrop());
+});
+document.getElementById("btn-down").addEventListener("touchend", stopHold);
+
 
     resetGame();
   </script>
