@@ -51,7 +51,7 @@ canvas {
     background: #020617;
     border: 4px solid #0f172a;
     border-radius: 10px;
-    display: block; /* ensures blocks appear */
+    display: block;
 }
 
 /* ------------------------------
@@ -73,7 +73,7 @@ canvas {
     font-size: 1.3rem;
     font-weight: bold;
     color: #b45309;
-    min-width: 160px; /* room for 4 digits */
+    min-width: 160px;
 }
 
 /* ------------------------------
@@ -88,12 +88,6 @@ button {
     cursor: pointer;
     touch-action: manipulation;
 }
-   if (collision(current.x, current.y, current.shape)) {
-    gameOver = true;
-    document.getElementById("game-over-popup").style.display = "flex";
-    return; // ← THIS IS REQUIRED
-}
-
 
 #restart {
     background: #22c55e;
@@ -126,15 +120,11 @@ button {
     border-radius: 10px;
     margin: 5px;
 }
-   <div id="game-over-popup">
-    <div id="popup-box">
-        <h2>GAME OVER</h2>
-        <p>GAME OVER CATHY – BETTER LUCK NEXT TIME</p>
-        <button id="popup-restart">Restart</button>
-    </div>
-</div>
 
-/* ADD POPUP CSS HERE */
+/* ------------------------------
+   POPUP
+------------------------------ */
+
 #game-over-popup {
     position: fixed;
     top: 0;
@@ -168,7 +158,6 @@ button {
 
 <div id="game-wrapper">
 
-    <!-- GAME -->
     <div id="game-container">
         <canvas id="board" width="260" height="520"></canvas>
 
@@ -182,10 +171,8 @@ button {
         </div>
     </div>
 
-    <!-- RESTART BUTTON -->
     <button id="restart">Restart</button>
 
-    <!-- CONTROLS -->
     <div id="controls">
         <div class="control-row">
             <button class="control-btn" id="btn-hold">Hold</button>
@@ -201,20 +188,19 @@ button {
     </div>
 
 </div>
-   <div id="game-over-popup">
+
+<!-- POPUP -->
+<div id="game-over-popup">
     <div id="popup-box">
         <h2>GAME OVER</h2>
         <p>GAME OVER CATHY – BETTER LUCK NEXT TIME</p>
         <button id="popup-restart">Restart</button>
     </div>
 </div>
+
 <script>
 
-</body>
-</html>
-
-  
-     /* -----------------------------------------
+/* -----------------------------------------
    CANVAS + CONTEXT
 ----------------------------------------- */
 const canvas = document.getElementById("board");
@@ -373,13 +359,11 @@ function lockPiece() {
     current = randomPiece();
     canHold = true;
 
-  if (collision(current.x, current.y, current.shape)) {
-    gameOver = true;
-    document.getElementById("game-over-popup").style.display = "flex";
-    return; // ← THIS IS REQUIRED
-}
-
-
+    if (collision(current.x, current.y, current.shape)) {
+        gameOver = true;
+        document.getElementById("game-over-popup").style.display = "flex";
+        return;
+    }
 }
 
 function clearLines() {
@@ -517,15 +501,12 @@ document.getElementById("btn-hold").addEventListener("click", holdCurrentPiece);
 
 restartBtn.addEventListener("click", resetGame);
 
-
-
 /* -----------------------------------------
    START GAME
 ----------------------------------------- */
 resetGame();
 
-
-    /* -----------------------------
+/* -----------------------------
    AUTO‑SCALE CANVAS TO SCREEN
 ------------------------------*/
 function autoScale() {
@@ -538,15 +519,14 @@ function autoScale() {
 window.addEventListener("resize", autoScale);
 window.addEventListener("orientationchange", autoScale);
 
-
 /* -----------------------------
    TOUCH‑HOLD REPEAT MOVEMENT
 ------------------------------*/
 let holdInterval = null;
 
 function startHold(action) {
-  action(); // immediate move
-  holdInterval = setInterval(action, 80); // repeat every 80ms
+  action();
+  holdInterval = setInterval(action, 80);
 }
 
 function stopHold() {
@@ -554,41 +534,40 @@ function stopHold() {
   holdInterval = null;
 }
 
-// LEFT HOLD
 document.getElementById("btn-left").addEventListener("touchstart", e => {
   e.preventDefault();
   startHold(() => move(-1));
 });
 document.getElementById("btn-left").addEventListener("touchend", stopHold);
 
-// RIGHT HOLD
 document.getElementById("btn-right").addEventListener("touchstart", e => {
   e.preventDefault();
   startHold(() => move(1));
 });
 document.getElementById("btn-right").addEventListener("touchend", stopHold);
 
-// DOWN HOLD (optional soft‑drop hold)
 document.getElementById("btn-down").addEventListener("touchstart", e => {
   e.preventDefault();
   startHold(() => softDrop());
 });
 document.getElementById("btn-down").addEventListener("touchend", stopHold);
-     document.getElementById("popup-restart").addEventListener("click", () => {
+
+/* POPUP RESTART */
+document.getElementById("popup-restart").addEventListener("click", () => {
     document.getElementById("game-over-popup").style.display = "none";
     resetGame();
 });
-     document.querySelectorAll("button").forEach(btn => {
+
+/* DISABLE LONG‑PRESS MENU */
+document.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
 });
 
+</script>
 
-
-
-    resetGame();
-  </script>
 </body>
 </html>
 
+  
 
 
