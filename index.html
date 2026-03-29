@@ -211,7 +211,8 @@ html, body {
         type,
         shape: SHAPES[type].map(row => [...row]),
         row: 0,
-        col: 3
+        col: Math.floor(COLS / 2) - 2
+
       };
     }
 
@@ -293,10 +294,25 @@ html, body {
     }
 
     function rotatePiece() {
-      const oldShape = current.shape;
-      current.shape = rotate(current.shape);
-      if (collide(board, current)) current.shape = oldShape;
-    }
+  const oldShape = current.shape;
+  const rotated = rotate(current.shape);
+
+  // Try normal rotation
+  current.shape = rotated;
+  if (!collide(board, current)) return;
+
+  // Try wall kick left
+  current.col--;
+  if (!collide(board, current)) return;
+
+  // Try wall kick right
+  current.col += 2;
+  if (!collide(board, current)) return;
+
+  // Revert if all fail
+  current.col--;
+  current.shape = oldShape;
+}
 
     function move(dx) {
       current.col += dx;
@@ -329,7 +345,8 @@ html, body {
           type: holdPiece,
           shape: SHAPES[holdPiece].map(r => [...r]),
           row: 0,
-          col: 3
+          col: Math.floor(COLS / 2) - 2
+
         };
         holdPiece = temp;
       }
