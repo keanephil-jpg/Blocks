@@ -189,306 +189,314 @@ button {
 </html>
 
   <script>
-    const canvas = document.getElementById("board");
-    const ctx = canvas.getContext("2d");
-    const scoreEl = document.getElementById("score");
-    const levelEl = document.getElementById("level");
-    const restartBtn = document.getElementById("restart");
+     /* -----------------------------------------
+   CANVAS + CONTEXT
+----------------------------------------- */
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
 
-    const COLS = 10;
-    const ROWS = 20;
-    const BLOCK = canvas.width / COLS;
+const scoreEl = document.getElementById("score");
+const levelEl = document.getElementById("level");
+const restartBtn = document.getElementById("restart");
 
-    const COLORS = {
-      I: "#22d3ee",
-      J: "#3b82f6",
-      L: "#f97316",
-      O: "#eab308",
-      S: "#22c55e",
-      T: "#a855f7",
-      Z: "#ef4444"
-    };
+/* -----------------------------------------
+   GAME CONSTANTS
+----------------------------------------- */
+const COLS = 10;
+const ROWS = 20;
+const BLOCK = canvas.width / COLS;
 
-    const SHAPES = {
-      I: [[1,1,1,1]],
-      J: [[1,0,0],[1,1,1]],
-      L: [[0,0,1],[1,1,1]],
-      O: [[1,1],[1,1]],
-      S: [[0,1,1],[1,1,0]],
-      T: [[0,1,0],[1,1,1]],
-      Z: [[1,1,0],[0,1,1]]
-    };
+const COLORS = {
+    I: "#22d3ee",
+    J: "#3b82f6",
+    L: "#f97316",
+    O: "#eab308",
+    S: "#22c55e",
+    T: "#a855f7",
+    Z: "#ef4444"
+};
 
-    let board, current, score, level, gameOver, dropInterval, lastTime, dropCounter;
+const SHAPES = {
+    I: [[1,1,1,1]],
+    J: [[1,0,0],[1,1,1]],
+    L: [[0,0,1],[1,1,1]],
+    O: [[1,1],[1,1]],
+    S: [[0,1,1],[1,1,0]],
+    T: [[0,1,0],[1,1,1]],
+    Z: [[1,1,0],[0,1,1]]
+};
 
-    let holdPiece = null;
-    let canHold = true;
-    // --------------------
-// HIGH SCORE SYSTEM
-// --------------------
+/* -----------------------------------------
+   GAME STATE
+----------------------------------------- */
+let board;
+let current;
+let score = 0;
+let level = 1;
+let gameOver = false;
+
+let dropInterval = 600;
+let lastTime = 0;
+let dropCounter = 0;
+
+let holdPiece = null;
+let canHold = true;
+
+/* -----------------------------------------
+   HIGH SCORE SYSTEM
+----------------------------------------- */
 let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("high-score").textContent = highScore;
 
 function updateHighScore() {
-  if (score > highScore) {
-    highScore = score;
-    localStorage.setItem("highScore", highScore);
-    document.getElementById("high-score").textContent = highScore;
-  }
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+        document.getElementById("high-score").textContent = highScore;
+    }
 }
 
+/* -----------------------------------------
+   BOARD SETUP
+----------------------------------------- */
+function createBoard() {
+    return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+}
 
-    function createBoard() {
-      const grid = [];
-      for (let r = 0; r < ROWS; r++) {
-        grid.push(new Array(COLS).fill(null));
-      }
-      return grid;
-    }
+/* -----------------------------------------
+   PIECE GENERATION
+----------------------------------------- */
+function randomPiece() {
+    const keys = Object.keys(SHAPES);
+    const type = keys[Math.floor(Math.random() * keys.length)];
+    return {
+        shape: SHAPES[type],
+        color: COLORS[type],
+        x: 3,
+        y: 0
+    };
+}
 
-    function randomPiece() {
-      const keys = Object.keys(SHAPES);
-      const type = keys[Math.floor(Math.random() * keys.length)];
-      return {
-        type,
-        shape: SHAPES[type].map(row => [...row]),
-        row: 0,
-        col: Math.floor(COLS / 2) - 2
+/* -----------------------------------------
+   DRAWING
+----------------------------------------- */
+function drawBlock(x, y, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
 
-      };
-    }
+    ctx.strokeStyle = "#0f172a";
+    ctx.strokeRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+}
 
-    function resetGame() {
-      board = createBoard();
-      current = randomPiece();
-      score = 0;
-      level = 1;
-      gameOver = false;
-      dropInterval = 600;
-      lastTime = 0;
-      dropCounter = 0;
-      holdPiece = null;
-      canHold = true;
-      scoreEl.textContent = score;
-      levelEl.textContent = level;
-      update();
-    }
-
-    function drawBlock(x, y, color) {
-      ctx.fillStyle = color;
-      ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-      ctx.strokeStyle = "#020617";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-    }
-
-    function drawBoard() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#020617";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for (let r = 0; r < ROWS; r++) {
+function drawBoard() {
+    for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          const cell = board[r][c];
-          if (cell) drawBlock(c, r, COLORS[cell]);
+            if (board[r][c] !== 0) {
+                drawBlock(c, r, board[r][c]);
+            }
         }
-      }
-
-      const color = COLORS[current.type];
-      current.shape.forEach((row, r) => {
-        row.forEach((val, c) => {
-          if (val) drawBlock(current.col + c, current.row + r, color);
-        });
-      });
     }
-
-    function collide(board, piece) {
-      for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-          if (!piece.shape[r][c]) continue;
-          const newR = piece.row + r;
-          const newC = piece.col + c;
-          if (newR < 0 || newR >= ROWS || newC < 0 || newC >= COLS) return true;
-          if (board[newR][newC]) return true;
-        }
-      }
-      return false;
-    }
-
-    function merge(board, piece) {
-      piece.shape.forEach((row, r) => {
-        row.forEach((val, c) => {
-          if (val) board[piece.row + r][piece.col + c] = piece.type;
-        });
-      });
-    }
-
-    function rotate(shape) {
-      const rows = shape.length;
-      const cols = shape[0].length;
-      const res = [];
-      for (let c = 0; c < cols; c++) {
-        const newRow = [];
-        for (let r = rows - 1; r >= 0; r--) newRow.push(shape[r][c]);
-        res.push(newRow);
-      }
-      return res;
-    }
-
-    function rotatePiece() {
-  const oldShape = current.shape;
-  const rotated = rotate(current.shape);
-
-  // Try normal rotation
-  current.shape = rotated;
-  if (!collide(board, current)) return;
-
-  // Try wall kick left
-  current.col--;
-  if (!collide(board, current)) return;
-
-  // Try wall kick right
-  current.col += 2;
-  if (!collide(board, current)) return;
-
-  // Revert if all fail
-  current.col--;
-  current.shape = oldShape;
 }
 
-    function move(dx) {
-      current.col += dx;
-      if (collide(board, current)) current.col -= dx;
-    }
-
-    function softDrop() {
-      current.row++;
-      if (collide(board, current)) {
-        current.row--;
-        lockPiece();
-      }
-    }
-
-    function hardDrop() {
-      while (!collide(board, current)) current.row++;
-      current.row--;
-      lockPiece();
-    }
-
-    function holdCurrentPiece() {
-      if (!canHold) return;
-
-      if (holdPiece === null) {
-        holdPiece = current.type;
-        current = randomPiece();
-      } else {
-        const temp = current.type;
-        current = {
-          type: holdPiece,
-          shape: SHAPES[holdPiece].map(r => [...r]),
-          row: 0,
-          col: Math.floor(COLS / 2) - 2
-
-        };
-        holdPiece = temp;
-      }
-
-      canHold = false;
-    }
-
-    function clearLines() {
-      let lines = 0;
-      outer: for (let r = ROWS - 1; r >= 0; r--) {
-        for (let c = 0; c < COLS; c++) {
-          if (!board[r][c]) continue outer;
-        }
-        board.splice(r, 1);
-        board.unshift(new Array(COLS).fill(null));
-        lines++;
-        r++;
-      }
-
-      if (lines > 0) {
-        score += lines * 100;
-        scoreEl.textContent = score;
-        updateHighScore();
-
-    level = Math.floor(score / 500) + 1;
-    levelEl.textContent = level;
-    dropInterval = Math.max(100, 600 - (level - 1) * 50);
-  }
+function drawPiece() {
+    current.shape.forEach((row, r) => {
+        row.forEach((value, c) => {
+            if (value) {
+                drawBlock(current.x + c, current.y + r, current.color);
+            }
+        });
+    });
 }
 
-        const newLevel = Math.floor(score / 500) + 1;
-        if (newLevel !== level) {
-          level = newLevel;
-          levelEl.textContent = level;
-          dropInterval = Math.max(120, dropInterval - 40);
+/* -----------------------------------------
+   COLLISION CHECK
+----------------------------------------- */
+function collision(x, y, shape) {
+    for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+            if (shape[r][c]) {
+                let newX = x + c;
+                let newY = y + r;
+
+                if (
+                    newX < 0 ||
+                    newX >= COLS ||
+                    newY >= ROWS ||
+                    (newY >= 0 && board[newY][newX] !== 0)
+                ) {
+                    return true;
+                }
+            }
         }
-      }
     }
+    return false;
+}
 
-    function lockPiece() {
-      merge(board, current);
-      clearLines();
-      current = randomPiece();
-      canHold = true;
-      if (collide(board, current)) gameOver = true;
-    }
-
-    function update(time = 0) {
-      if (gameOver) {
-        ctx.fillStyle = "rgba(15,23,42,0.8)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#f97316";
-        ctx.font = "bold 24px system-ui";
-        ctx.textAlign = "center";
-        ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 10);
-        ctx.fillStyle = "#e5e7eb";
-        ctx.font = "16px system-ui";
-        ctx.fillText("Tap Restart to play again", canvas.width / 2, canvas.height / 2 + 20);
-        return;
-      }
-
-      const delta = time - lastTime;
-      lastTime = time;
-      dropCounter += delta;
-
-      if (dropCounter > dropInterval) {
-        softDrop();
-        dropCounter = 0;
-      }
-
-      drawBoard();
-      requestAnimationFrame(update);
-    }
-
-    window.addEventListener("keydown", (e) => {
-      if (gameOver) return;
-      switch (e.key) {
-        case "ArrowLeft": move(-1); break;
-        case "ArrowRight": move(1); break;
-        case "ArrowDown": softDrop(); break;
-        case "ArrowUp":
-        case "x":
-        case "X": rotatePiece(); break;
-        case " ": hardDrop(); break;
-        case "c":
-        case "C": holdCurrentPiece(); break;
-      }
+/* -----------------------------------------
+   LOCK PIECE + CLEAR LINES
+----------------------------------------- */
+function lockPiece() {
+    current.shape.forEach((row, r) => {
+        row.forEach((value, c) => {
+            if (value) {
+                board[current.y + r][current.x + c] = current.color;
+            }
+        });
     });
 
-    document.getElementById("btn-left").addEventListener("click", () => move(-1));
-    document.getElementById("btn-right").addEventListener("click", () => move(1));
-    document.getElementById("btn-down").addEventListener("click", () => softDrop());
-    document.getElementById("btn-rot").addEventListener("click", () => rotatePiece());
-    document.getElementById("btn-drop").addEventListener("click", () => hardDrop());
-    document.getElementById("btn-hold").addEventListener("click", () => holdCurrentPiece());
+    clearLines();
+    current = randomPiece();
+    canHold = true;
 
-    restartBtn.addEventListener("click", resetGame);
-    document.getElementById("exit-btn").addEventListener("click", () => {
-  window.location.href = "index.html";   // or your main menu file
+    if (collision(current.x, current.y, current.shape)) {
+        gameOver = true;
+    }
+}
+
+function clearLines() {
+    let lines = 0;
+
+    for (let r = ROWS - 1; r >= 0; r--) {
+        if (board[r].every(cell => cell !== 0)) {
+            board.splice(r, 1);
+            board.unshift(Array(COLS).fill(0));
+            lines++;
+            r++;
+        }
+    }
+
+    if (lines > 0) {
+        score += lines * 100;
+        scoreEl.textContent = score;
+
+        updateHighScore();
+
+        level = Math.floor(score / 500) + 1;
+        levelEl.textContent = level;
+
+        dropInterval = Math.max(100, 600 - (level - 1) * 50);
+    }
+}
+
+/* -----------------------------------------
+   MOVEMENT
+----------------------------------------- */
+function move(dir) {
+    if (!collision(current.x + dir, current.y, current.shape)) {
+        current.x += dir;
+    }
+}
+
+function softDrop() {
+    if (!collision(current.x, current.y + 1, current.shape)) {
+        current.y++;
+    } else {
+        lockPiece();
+    }
+}
+
+function hardDrop() {
+    while (!collision(current.x, current.y + 1, current.shape)) {
+        current.y++;
+    }
+    lockPiece();
+}
+
+function rotatePiece() {
+    const rotated = current.shape[0].map((_, i) =>
+        current.shape.map(row => row[i]).reverse()
+    );
+
+    if (!collision(current.x, current.y, rotated)) {
+        current.shape = rotated;
+    }
+}
+
+/* -----------------------------------------
+   HOLD SYSTEM
+----------------------------------------- */
+function holdCurrentPiece() {
+    if (!canHold) return;
+
+    if (holdPiece === null) {
+        holdPiece = current;
+        current = randomPiece();
+    } else {
+        let temp = current;
+        current = holdPiece;
+        holdPiece = temp;
+    }
+
+    current.x = 3;
+    current.y = 0;
+    canHold = false;
+}
+
+/* -----------------------------------------
+   GAME LOOP
+----------------------------------------- */
+function update(time = 0) {
+    if (gameOver) return;
+
+    const delta = time - lastTime;
+    lastTime = time;
+
+    dropCounter += delta;
+    if (dropCounter > dropInterval) {
+        softDrop();
+        dropCounter = 0;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawBoard();
+    drawPiece();
+
+    requestAnimationFrame(update);
+}
+
+/* -----------------------------------------
+   RESET GAME
+----------------------------------------- */
+function resetGame() {
+    board = createBoard();
+    current = randomPiece();
+    score = 0;
+    level = 1;
+    gameOver = false;
+    dropInterval = 600;
+    dropCounter = 0;
+    lastTime = 0;
+    holdPiece = null;
+    canHold = true;
+
+    scoreEl.textContent = score;
+    levelEl.textContent = level;
+
+    update();
+}
+
+/* -----------------------------------------
+   BUTTON CONTROLS
+----------------------------------------- */
+document.getElementById("btn-left").addEventListener("click", () => move(-1));
+document.getElementById("btn-right").addEventListener("click", () => move(1));
+document.getElementById("btn-down").addEventListener("click", softDrop);
+document.getElementById("btn-rot").addEventListener("click", rotatePiece);
+document.getElementById("btn-drop").addEventListener("click", hardDrop);
+document.getElementById("btn-hold").addEventListener("click", holdCurrentPiece);
+
+restartBtn.addEventListener("click", resetGame);
+
+document.getElementById("exit-btn").addEventListener("click", () => {
+    window.location.href = "index.html";
 });
+
+/* -----------------------------------------
+   START GAME
+----------------------------------------- */
+resetGame();
+
 
     /* -----------------------------
    AUTO‑SCALE CANVAS TO SCREEN
