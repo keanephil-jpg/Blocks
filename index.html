@@ -1,204 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Blocks Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- iPad Home Screen Icon -->
-  <link rel="apple-touch-icon" href="icon3.png">
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #C8F7DC; /* mint green */
-      color: #0f172a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blocks</title>
 
-    h1 {
-      margin: 14px 0 0;
-      font-size: 1.8rem;
-      color: #0f172a;
-    }
+<style>
 
-    #game-container {
-      margin-top: 14px;
-      padding: 16px;
-      background: #E8FFE8; /* soft pastel frame */
-      border: 4px solid #A4E4C0;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+/* ------------------------------
+   GLOBAL
+------------------------------ */
 
-    canvas {
-      background: #020617;
-      border: 4px solid #0f172a;
-      border-radius: 10px;
-      touch-action: none;
-    }
-    #game-wrapper {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f9ff;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
 }
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 2.4rem;
+    color: #0f172a;
+}
+
+/* ------------------------------
+   LAYOUT
+------------------------------ */
+
+#game-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+/* ------------------------------
+   GAME CONTAINER
+------------------------------ */
+
+#game-container {
+    padding: 16px;
+    background: #E8FFF8;
+    border: 4px solid #A4E4C0;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+canvas {
+    background: #020617;
+    border: 4px solid #0f172a;
+    border-radius: 10px;
+    display: block; /* FIXES INVISIBLE BLOCKS */
+}
+
+/* ------------------------------
+   SCORE + LEVEL
+------------------------------ */
+
+#info {
+    margin-top: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* ------------------------------
+   SIDE PANEL
+------------------------------ */
 
 #side-panel {
     display: flex;
     flex-direction: column;
+    justify-content: center; /* vertically aligns with game */
     gap: 20px;
-    width: 150px;
+    width: 160px;
 }
 
 #high-score-box {
     background: #fff7ed;
     border: 2px solid #f97316;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 1.2rem;
-    text-align: center;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 1.3rem;
     font-weight: bold;
+    color: #b45309;
+    min-width: 140px; /* room for 4 digits */
 }
+
+/* ------------------------------
+   BUTTONS
+------------------------------ */
+
+button {
+    font-size: 1.2rem;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
 #exit-btn {
     background: #f97316;
     color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
-    touch-action: manipulation;
 }
 
 #exit-btn:active {
     transform: scale(0.96);
 }
 
-    #info {
-      margin-top: 10px;
-      font-size: 1.2rem;
-      color: #0f172a;
-      font-weight: 600;
-    }
-
-    #controls {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 120px);
-      grid-template-rows: repeat(3, 80px);
-      gap: 14px;
-      justify-content: center;
-    }
-
- #controls button {
-  font-size: 1.3rem;
-  font-weight: 700;
-  border-radius: 14px;
-  border: none;
-  background: #FFD1B3; /* pastel peach */
-  color: #5a3d2b;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+#restart {
+    background: #22c55e;
+    color: white;
+    margin-top: 20px;
 }
 
-/* Prevent iPad text selection + popup menu */
-button {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+/* ------------------------------
+   CONTROLS
+------------------------------ */
+
+#controls {
+    margin-top: 20px;
 }
 
-/* Remove blue highlight ring */
-button:focus {
-  outline: none;
+.control-row {
+    margin-top: 10px;
 }
 
-    #controls button:active {
-      background: #FFBC99;
-      transform: translateY(2px);
-    }
-
-    /* Button positions */
-    #btn-hold { grid-column: 1; grid-row: 1; }
-    #btn-rot  { grid-column: 2; grid-row: 1; }
-    #btn-drop { grid-column: 3; grid-row: 1; }
-
-    #btn-left  { grid-column: 1; grid-row: 2; }
-    #btn-down  { grid-column: 2; grid-row: 2; }
-    #btn-right { grid-column: 3; grid-row: 2; }
-
-    #restart {
-      margin-top: 16px;
-      padding: 12px 24px;
-      font-size: 1.1rem;
-      border-radius: 999px;
-      border: none;
-      background: #22c55e;
-      color: #022c22;
-      font-weight: 700;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.25);
-    }
-
-    #restart:active {
-      transform: translateY(2px);
-      background: #16a34a;
-    }
-    /* Prevent iPad text selection + popup menu */
-button, html, body {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: manipulation; /* stops double‑tap zoom */
+.control-btn {
+    background: #fef3c7;
+    border: 2px solid #fcd34d;
+    padding: 10px 16px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    margin: 5px;
 }
 
-/* Remove blue highlight ring */
-button:focus {
-  outline: none;
-}
-
-/* Auto-scale the game container */
-#game-container {
-  transform-origin: top center;
-}
-
-/* Prevent zooming when tapping rapidly */
-html, body {
-  touch-action: manipulation;
-}
-    #exit-btn {
-  background: #f97316;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
-  touch-action: manipulation;
-}
-
-#exit-btn:active {
-  transform: scale(0.96);
-}
-
-
-  </style>
+</style>
 </head>
+
 <body>
-  <h1>Blocks</h1>
 
- <div id="game-wrapper">
+<h1>Blocks</h1>
 
+<div id="game-wrapper">
+
+    <!-- LEFT SIDE: GAME -->
     <div id="game-container">
         <canvas id="board" width="260" height="520"></canvas>
 
@@ -208,6 +156,7 @@ html, body {
         </div>
     </div>
 
+    <!-- RIGHT SIDE: HIGH SCORE + EXIT -->
     <div id="side-panel">
         <div id="high-score-box">
             High Score: <span id="high-score">0</span>
@@ -218,20 +167,26 @@ html, body {
 
 </div>
 
+<!-- RESTART BUTTON -->
 <button id="restart">Restart</button>
 
-
-    <button id="restart">Restart</button>
-
-    <div id="controls">
-      <button id="btn-hold">Hold</button>
-      <button id="btn-rot">Rotate</button>
-      <button id="btn-drop">Drop</button>
-      <button id="btn-left">◀</button>
-      <button id="btn-down">▼</button>
-      <button id="btn-right">▶</button>
+<!-- CONTROLS -->
+<div id="controls">
+    <div class="control-row">
+        <button class="control-btn" id="btn-hold">Hold</button>
+        <button class="control-btn" id="btn-rot">Rotate</button>
+        <button class="control-btn" id="btn-drop">Drop</button>
     </div>
-  </div>
+
+    <div class="control-row">
+        <button class="control-btn" id="btn-left">←</button>
+        <button class="control-btn" id="btn-down">↓</button>
+        <button class="control-btn" id="btn-right">→</button>
+    </div>
+</div>
+
+</body>
+</html>
 
   <script>
     const canvas = document.getElementById("board");
