@@ -134,6 +134,24 @@ button:focus {
 html, body {
   touch-action: manipulation;
 }
+    #exit-btn {
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  touch-action: manipulation;
+}
+
+#exit-btn:active {
+  transform: scale(0.96);
+}
+
 
   </style>
 </head>
@@ -146,6 +164,8 @@ html, body {
     <div id="info">
       Score: <span id="score">0</span> &nbsp; | &nbsp;
       Level: <span id="level">1</span>
+      <button id="exit-btn">Exit Game</button>
+
     </div>
 
     <button id="restart">Restart</button>
@@ -195,6 +215,20 @@ html, body {
 
     let holdPiece = null;
     let canHold = true;
+    // --------------------
+// HIGH SCORE SYSTEM
+// --------------------
+let highScore = localStorage.getItem("highScore") || 0;
+document.getElementById("high-score").textContent = highScore;
+
+function updateHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("highScore", highScore);
+    document.getElementById("high-score").textContent = highScore;
+  }
+}
+
 
     function createBoard() {
       const grid = [];
@@ -369,6 +403,13 @@ html, body {
       if (lines > 0) {
         score += lines * 100;
         scoreEl.textContent = score;
+        updateHighScore();
+
+    level = Math.floor(score / 500) + 1;
+    levelEl.textContent = level;
+    dropInterval = Math.max(100, 600 - (level - 1) * 50);
+  }
+}
 
         const newLevel = Math.floor(score / 500) + 1;
         if (newLevel !== level) {
@@ -437,6 +478,10 @@ html, body {
     document.getElementById("btn-hold").addEventListener("click", () => holdCurrentPiece());
 
     restartBtn.addEventListener("click", resetGame);
+    document.getElementById("exit-btn").addEventListener("click", () => {
+  window.location.href = "index.html";   // or your main menu file
+});
+
     /* -----------------------------
    AUTO‑SCALE CANVAS TO SCREEN
 ------------------------------*/
