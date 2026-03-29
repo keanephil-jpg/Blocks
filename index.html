@@ -31,14 +31,8 @@ h1 {
 
 #game-wrapper {
     display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 10px;
-   #game-wrapper {
-    margin-left: auto;
-    margin-right: auto;
-}
-
+    flex-direction: column;
+    align-items: center;
 }
 
 /* ------------------------------
@@ -57,11 +51,11 @@ canvas {
     background: #020617;
     border: 4px solid #0f172a;
     border-radius: 10px;
-    display: block; /* FIXES INVISIBLE BLOCKS */
+    display: block; /* ensures blocks appear */
 }
 
 /* ------------------------------
-   SCORE + LEVEL
+   SCORE + LEVEL + HIGH SCORE
 ------------------------------ */
 
 #info {
@@ -70,27 +64,16 @@ canvas {
     font-weight: bold;
 }
 
-/* ------------------------------
-   SIDE PANEL
------------------------------- */
-
-#side-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* vertically aligns with game */
-    gap: 20px;
-    width: 160px;
-}
-
 #high-score-box {
+    margin-top: 10px;
     background: #fff7ed;
     border: 2px solid #f97316;
     border-radius: 12px;
-    padding: 12px;
+    padding: 10px;
     font-size: 1.3rem;
     font-weight: bold;
     color: #b45309;
-    min-width: 140px; /* room for 4 digits */
+    min-width: 160px; /* room for 4 digits */
 }
 
 /* ------------------------------
@@ -106,7 +89,6 @@ button {
     touch-action: manipulation;
 }
 
-
 #restart {
     background: #22c55e;
     color: white;
@@ -118,17 +100,17 @@ button {
 ------------------------------ */
 
 #controls {
-    width: 100%;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* centers horizontally */
+    align-items: center;
 }
 
 .control-row {
     display: flex;
     justify-content: center;
+    margin-top: 10px;
 }
-
 
 .control-btn {
     background: #fef3c7;
@@ -148,7 +130,7 @@ button {
 
 <div id="game-wrapper">
 
-    <!-- LEFT SIDE: GAME -->
+    <!-- GAME -->
     <div id="game-container">
         <canvas id="board" width="260" height="520"></canvas>
 
@@ -156,38 +138,35 @@ button {
             Score: <span id="score">0</span> &nbsp; | &nbsp;
             Level: <span id="level">1</span>
         </div>
-    </div>
 
-    <!-- RIGHT SIDE: HIGH SCORE + EXIT -->
-    <div id="side-panel">
         <div id="high-score-box">
             High Score: <span id="high-score">0</span>
         </div>
-
     </div>
 
-</div>
+    <!-- RESTART BUTTON -->
+    <button id="restart">Restart</button>
 
-<!-- RESTART BUTTON -->
-<button id="restart">Restart</button>
+    <!-- CONTROLS -->
+    <div id="controls">
+        <div class="control-row">
+            <button class="control-btn" id="btn-hold">Hold</button>
+            <button class="control-btn" id="btn-rot">Rotate</button>
+            <button class="control-btn" id="btn-drop">Drop</button>
+        </div>
 
-<!-- CONTROLS -->
-<div id="controls">
-    <div class="control-row">
-        <button class="control-btn" id="btn-hold">Hold</button>
-        <button class="control-btn" id="btn-rot">Rotate</button>
-        <button class="control-btn" id="btn-drop">Drop</button>
+        <div class="control-row">
+            <button class="control-btn" id="btn-left">←</button>
+            <button class="control-btn" id="btn-down">↓</button>
+            <button class="control-btn" id="btn-right">→</button>
+        </div>
     </div>
 
-    <div class="control-row">
-        <button class="control-btn" id="btn-left">←</button>
-        <button class="control-btn" id="btn-down">↓</button>
-        <button class="control-btn" id="btn-right">→</button>
-    </div>
 </div>
 
 </body>
 </html>
+
 
   <script>
      /* -----------------------------------------
