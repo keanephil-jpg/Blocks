@@ -43,6 +43,45 @@
       border-radius: 10px;
       touch-action: none;
     }
+    #game-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+#side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 150px;
+}
+
+#high-score-box {
+    background: #fff7ed;
+    border: 2px solid #f97316;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: bold;
+}
+#exit-btn {
+    background: #f97316;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    touch-action: manipulation;
+}
+
+#exit-btn:active {
+    transform: scale(0.96);
+}
 
     #info {
       margin-top: 10px;
@@ -158,25 +197,29 @@ html, body {
 <body>
   <h1>Blocks</h1>
 
- <div id="game-container">
-    <canvas id="board" width="260" height="520"></canvas>
+ <div id="game-wrapper">
 
-    <div id="info">
-        Score: <span id="score">0</span> &nbsp; | &nbsp;
-        Level: <span id="level">1</span>
+    <div id="game-container">
+        <canvas id="board" width="260" height="520"></canvas>
 
+        <div id="info">
+            Score: <span id="score">0</span> &nbsp; | &nbsp;
+            Level: <span id="level">1</span>
+        </div>
+    </div>
+
+    <div id="side-panel">
         <div id="high-score-box">
             High Score: <span id="high-score">0</span>
         </div>
+
+        <button id="exit-btn">Exit Game</button>
     </div>
+
 </div>
 
-<button id="exit-btn">Exit Game</button>
 <button id="restart">Restart</button>
 
-
-
-    </div>
 
     <button id="restart">Restart</button>
 
