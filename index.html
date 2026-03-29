@@ -88,6 +88,12 @@ button {
     cursor: pointer;
     touch-action: manipulation;
 }
+   if (collision(current.x, current.y, current.shape)) {
+    gameOver = true;
+    document.getElementById("game-over-popup").style.display = "flex";
+    return; // ← THIS IS REQUIRED
+}
+
 
 #restart {
     background: #22c55e;
@@ -367,7 +373,9 @@ function lockPiece() {
   if (collision(current.x, current.y, current.shape)) {
     gameOver = true;
     document.getElementById("game-over-popup").style.display = "flex";
+    return; // ← THIS IS REQUIRED
 }
+
 
 }
 
@@ -567,6 +575,10 @@ document.getElementById("btn-down").addEventListener("touchend", stopHold);
     document.getElementById("game-over-popup").style.display = "none";
     resetGame();
 });
+     document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+});
+
 
 
 
