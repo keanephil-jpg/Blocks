@@ -558,10 +558,15 @@ document.getElementById("popup-restart").addEventListener("click", () => {
     resetGame();
 });
 
-/* DISABLE LONG‑PRESS MENU */
 document.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+    btn.addEventListener("touchstart", e => {
+        // Only prevent default for movement buttons
+        if (btn.id === "btn-left" || btn.id === "btn-right" || btn.id === "btn-down") {
+            e.preventDefault();
+        }
+    }, { passive: false });
 });
+
 
 </script>
 
