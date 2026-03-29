@@ -144,7 +144,7 @@ html, body {
   font-weight: bold;
   cursor: pointer;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 20px;
   touch-action: manipulation;
 }
 
@@ -158,13 +158,23 @@ html, body {
 <body>
   <h1>Blocks</h1>
 
-  <div id="game-container">
+ <div id="game-container">
     <canvas id="board" width="260" height="520"></canvas>
 
     <div id="info">
-      Score: <span id="score">0</span> &nbsp; | &nbsp;
-      Level: <span id="level">1</span>
-      <button id="exit-btn">Exit Game</button>
+        Score: <span id="score">0</span> &nbsp; | &nbsp;
+        Level: <span id="level">1</span>
+
+        <div id="high-score-box">
+            High Score: <span id="high-score">0</span>
+        </div>
+    </div>
+</div>
+
+<button id="exit-btn">Exit Game</button>
+<button id="restart">Restart</button>
+
+
 
     </div>
 
