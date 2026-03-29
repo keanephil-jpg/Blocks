@@ -34,6 +34,11 @@ h1 {
     justify-content: center;
     gap: 30px;
     margin-top: 10px;
+   #game-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 }
 
 /* ------------------------------
@@ -101,14 +106,6 @@ button {
     touch-action: manipulation;
 }
 
-#exit-btn {
-    background: #f97316;
-    color: white;
-}
-
-#exit-btn:active {
-    transform: scale(0.96);
-}
 
 #restart {
     background: #22c55e;
@@ -121,12 +118,17 @@ button {
 ------------------------------ */
 
 #controls {
-    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers horizontally */
 }
 
 .control-row {
-    margin-top: 10px;
+    display: flex;
+    justify-content: center;
 }
+
 
 .control-btn {
     background: #fef3c7;
@@ -162,7 +164,6 @@ button {
             High Score: <span id="high-score">0</span>
         </div>
 
-        <button id="exit-btn">Exit Game</button>
     </div>
 
 </div>
@@ -488,9 +489,7 @@ document.getElementById("btn-hold").addEventListener("click", holdCurrentPiece);
 
 restartBtn.addEventListener("click", resetGame);
 
-document.getElementById("exit-btn").addEventListener("click", () => {
-    window.location.href = "index.html";
-});
+
 
 /* -----------------------------------------
    START GAME
