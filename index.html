@@ -120,6 +120,42 @@ button {
     border-radius: 10px;
     margin: 5px;
 }
+   <div id="game-over-popup">
+    <div id="popup-box">
+        <h2>GAME OVER</h2>
+        <p>GAME OVER CATHY – BETTER LUCK NEXT TIME</p>
+        <button id="popup-restart">Restart</button>
+    </div>
+</div>
+
+/* ADD POPUP CSS HERE */
+#game-over-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+#popup-box {
+    background: #fff7ed;
+    border: 3px solid #f97316;
+    border-radius: 20px;
+    padding: 30px;
+    width: 80%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+</style>
+
+
 
 </style>
 </head>
@@ -328,9 +364,11 @@ function lockPiece() {
     current = randomPiece();
     canHold = true;
 
-    if (collision(current.x, current.y, current.shape)) {
-        gameOver = true;
-    }
+  if (collision(current.x, current.y, current.shape)) {
+    gameOver = true;
+    document.getElementById("game-over-popup").style.display = "flex";
+}
+
 }
 
 function clearLines() {
@@ -525,6 +563,11 @@ document.getElementById("btn-down").addEventListener("touchstart", e => {
   startHold(() => softDrop());
 });
 document.getElementById("btn-down").addEventListener("touchend", stopHold);
+     document.getElementById("popup-restart").addEventListener("click", () => {
+    document.getElementById("game-over-popup").style.display = "none";
+    resetGame();
+});
+
 
 
     resetGame();
